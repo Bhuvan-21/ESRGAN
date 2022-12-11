@@ -23,7 +23,7 @@ from torch.autograd import Variable
 
 from models import *
 from datasets import *
-
+from tqdm import trange
 import torch.nn as nn
 import torch.nn.functional as F
 import torch
@@ -36,7 +36,7 @@ parser.add_argument("--epoch", type=int, default=0, help="epoch to start trainin
 parser.add_argument("--data_path", type=str, help="Path to dataset")
 parser.add_argument("--n_epochs", type=int, default=200, help="number of epochs of training")
 parser.add_argument("--dataset_name", type=str, default="img_align_celeba", help="name of the dataset")
-parser.add_argument("--batch_size", type=int, default=4, help="size of the batches")
+parser.add_argument("--batch_size", type=int, default=1, help="size of the batches")
 parser.add_argument("--lr", type=float, default=0.0002, help="adam: learning rate")
 parser.add_argument("--b1", type=float, default=0.9, help="adam: decay of first order momentum of gradient")
 parser.add_argument("--b2", type=float, default=0.999, help="adam: decay of first order momentum of gradient")
@@ -93,8 +93,8 @@ dataloader = DataLoader(
 #  Training
 # ----------
 
-for epoch in range(opt.epoch, opt.n_epochs):
-    for i, imgs in enumerate(dataloader):
+for epoch in trange(opt.epoch, opt.n_epochs):
+    for i, imgs in enumerate(tqdm(dataloader)):
 
         batches_done = epoch * len(dataloader) + i
 
