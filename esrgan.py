@@ -20,7 +20,7 @@ from torchvision.utils import save_image, make_grid
 
 from torch.utils.data import DataLoader
 from torch.autograd import Variable
-
+import tqdm
 from models import *
 from datasets import *
 from tqdm import trange
