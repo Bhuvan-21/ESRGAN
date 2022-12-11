@@ -20,10 +20,9 @@ from torchvision.utils import save_image, make_grid
 
 from torch.utils.data import DataLoader
 from torch.autograd import Variable
-import tqdm
 from models import *
 from datasets import *
-from tqdm import trange
+from tqdm import tqdm, trange
 import torch.nn as nn
 import torch.nn.functional as F
 import torch
@@ -92,9 +91,10 @@ dataloader = DataLoader(
 # ----------
 #  Training
 # ----------
-
-for epoch in trange(opt.epoch, opt.n_epochs):
-    for i, imgs in enumerate(tqdm(dataloader)):
+t = trange(opt.epoch, opt.n_epochs, leave=True)
+for epoch in t:
+    pbar = tqdm(dataloader)
+    for i, imgs in enumerate(pbar):
 
         batches_done = epoch * len(dataloader) + i
 
@@ -122,10 +122,11 @@ for epoch in trange(opt.epoch, opt.n_epochs):
             # Warm-up (pixel-wise loss only)
             loss_pixel.backward()
             optimizer_G.step()
-            print(
+            desc = (
                 "[Epoch %d/%d] [Batch %d/%d] [G pixel: %f]"
                 % (epoch, opt.n_epochs, i, len(dataloader), loss_pixel.item())
             )
+            pbar.set_description(desc)
             continue
 
         # Extract validity predictions from discriminator
@@ -169,8 +170,7 @@ for epoch in trange(opt.epoch, opt.n_epochs):
         #  Log Progress
         # --------------
 
-        print(
-            "[Epoch %d/%d] [Batch %d/%d] [D loss: %f] [G loss: %f, content: %f, adv: %f, pixel: %f]"
+        desc = ("[Epoch %d/%d] [Batch %d/%d] [D loss: %f] [G loss: %f, content: %f, adv: %f, pixel: %f]"
             % (
                 epoch,
                 opt.n_epochs,
@@ -181,9 +181,8 @@ for epoch in trange(opt.epoch, opt.n_epochs):
                 loss_content.item(),
                 loss_GAN.item(),
                 loss_pixel.item(),
-            )
-        )
-
+            ))
+        pbar.set_description(desc)
         if batches_done % opt.sample_interval == 0:
             # Save image grid with upsampled inputs and ESRGAN outputs
             imgs_lr = nn.functional.interpolate(imgs_lr, scale_factor=4)
