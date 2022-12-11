@@ -56,6 +56,7 @@ class ImageDataset(Dataset):
             img_lr = self.lr_transform_bicubic(img)
         else:
             img_lr = self.lr_transform_bilinear(img)
+        img_lr = torch.tensor(random_noise(img_lr, mode='gaussian', mean=0, var=0.1, clip=True))
         img_hr = self.hr_transform(img)
 
         return {"lr": img_lr, "hr": img_hr}
